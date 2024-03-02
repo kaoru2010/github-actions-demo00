@@ -1,3 +1,19 @@
+version-resolver:
+  major:
+    labels:
+      - 'major'
+  minor:
+    labels:
+      - 'minor'
+  patch:
+    labels:
+      - 'patch'
+  default: patch
+
+tag-prefix: v
+
+prerelease: true
+
 template: |
   ## What’s Changed
 
