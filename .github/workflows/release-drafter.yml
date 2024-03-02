@@ -6,10 +6,11 @@ on:
       - master
       - main
   pull_request:
-    types: [opened, reopened, synchronize]
+    types: [opened, reopened, synchronize, labeled]
 
 jobs:
   update_release_draft:
+    if: contains(github.event.pull_request.labels.*.name, 'release_note')
     runs-on: ubuntu-latest
     steps:
       - uses: release-drafter/release-drafter@v5
