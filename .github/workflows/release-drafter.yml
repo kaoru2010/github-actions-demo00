@@ -6,7 +6,8 @@ on:
       - master
       - main
   pull_request:
-    types: [opened, reopened, synchronize, labeled]
+    #types: [opened, reopened, synchronize]
+    types: [labeled]
 
 permissions:
   contents: read
@@ -23,5 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: release-drafter/release-drafter@v5
+       with:
+         commitish: main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
