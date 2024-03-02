@@ -1,3 +1,8 @@
+# https://zenn.dev/chocoyama/articles/654a80f96d10ef
+
+name-template: '🍏 $RESOLVED_VERSION'
+tag-template: '$RESOLVED_VERSION'
+
 version-resolver:
   major:
     labels:
