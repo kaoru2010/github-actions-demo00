@@ -1,7 +1,7 @@
 # https://zenn.dev/chocoyama/articles/654a80f96d10ef
 
-name-template: '🍏 $RESOLVED_VERSION'
-tag-template: '$RESOLVED_VERSION'
+name-template: '🍏 v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
 
 version-resolver:
   major:
@@ -13,7 +13,7 @@ version-resolver:
   patch:
     labels:
       - 'patch'
-  default: patch
+  default: minor
 
 tag-prefix: v
 
