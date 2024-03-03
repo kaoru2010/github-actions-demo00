@@ -21,10 +21,36 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.commit-ish }}
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: adopt
+          java-version: 17
+          cache: gradle
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Detect app version from manifest
+        id: detect_version
+        env:
+          GRADLE_TASK: ":app:processDebugMainManifest"
+          MANIFEST_FILE: ./app/build/intermediates/merged_manifest/debug/processDebugMainManifest/AndroidManifest.xml
+        run: |
+          ./gradlew $GRADLE_TASK
+          cat "$MANIFEST_FILE" | python3 tools/apk_util/parse_app_version.py >> "$GITHUB_OUTPUT"
       - uses: release-drafter/release-drafter@v5
         with:
           commitish: main
           name: "Draft"
           tag: ''
+          header: |
+            設定されているバージョンが正しい確認してください。
+            ```
+            v${{ steps.detect_version.outputs.version_name }}(${{ steps.detect_version.outputs.version_code }})
+            ```
+
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
