@@ -42,13 +42,16 @@ jobs:
         run: |
           ./gradlew $GRADLE_TASK
           cat "$MANIFEST_FILE" | python3 tools/apk_util/parse_app_version.py >> "$GITHUB_OUTPUT"
+          TZ=Asia/Tokyo date "+%Y%m%dT%H%M%S" | xargs -I"{}" echo "dev_version={}" >> "$GITHUB_OUTPUT"
       - uses: release-drafter/release-drafter@v5
         id: create_release
         with:
           commitish: ${{ github.event.inputs.commit-ish }}
-          version: "${{ steps.detect_version.outputs.version_name }}"
+          tag: "v${{ steps.detect_version.outputs.version_name }}.dev.${{ steps.detect_version.outputs.dev_version }}"
+          name: "v${{ steps.detect_version.outputs.version_name }}.dev.${{ steps.detect_version.outputs.dev_version }}(${{ steps.detect_version.outputs.version_code }})"
           prerelease: true
-          prerelease-identifier: "dev"
+          prerelease-identifier: dev
+          publish: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload Release Asset
