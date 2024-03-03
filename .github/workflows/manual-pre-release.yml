@@ -1,0 +1,63 @@
+name: Manual Pre-Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit-ish:
+        type: string
+        required: true
+        description: 'ビルド対象'
+        default: main
+
+permissions:
+  contents: read
+
+jobs:
+  update_releases:
+    permissions:
+      # write permission is required to create a github release
+      contents: write
+      # write permission is required for autolabeler
+      # otherwise, read permission is required at least
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.commit-ish }}
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: adopt
+          java-version: 17
+          cache: gradle
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Detect app version from manifest
+        id: detect_version
+        env:
+          GRADLE_TASK: assembleDebug # ":app:processDebugMainManifest"
+          MANIFEST_FILE: ./app/build/intermediates/merged_manifest/debug/processDebugMainManifest/AndroidManifest.xml
+        run: |
+          ./gradlew $GRADLE_TASK
+          cat "$MANIFEST_FILE" | python3 tools/apk_util/parse_app_version.py >> "$GITHUB_OUTPUT"
+      - uses: release-drafter/release-drafter@v5
+        id: create_release
+        with:
+          commitish: ${{ github.event.inputs.commit-ish }}
+          version: "${{ steps.detect_version.outputs.version_name }}"
+          prerelease: true
+          prerelease-identifier: "dev"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./app/build/outputs/apk/debug/app-debug.apk
+          asset_name: "github-actions-demo00_v${{ steps.detect_version.outputs.version_name }}(${{ steps.detect_version.outputs.version_code }}).apk"
+          asset_content_type: application/zip
