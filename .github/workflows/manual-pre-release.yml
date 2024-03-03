@@ -56,7 +56,7 @@ jobs:
           prerelease: true
           prerelease-identifier: dev
           publish: true
-          head: "${{ steps.validate_commit-ish.outputs.commit_id }}"
+          header: "${{ steps.validate_commit-ish.outputs.commit_id }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload Release Asset
