@@ -41,7 +41,7 @@ jobs:
         run: |
           ./gradlew $GRADLE_TASK
           cat "$MANIFEST_FILE" | python3 tools/apk_util/parse_app_version.py >> "$GITHUB_OUTPUT"
-      - uses: release-drafter/release-drafter@v5
+      - uses: release-drafter/release-drafter@v6
         with:
           commitish: main
           name: "Draft"
@@ -51,6 +51,5 @@ jobs:
             ```
             v${{ steps.detect_version.outputs.version_name }}(${{ steps.detect_version.outputs.version_code }})
             ```
-
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
