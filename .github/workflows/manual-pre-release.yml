@@ -62,5 +62,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./app/build/outputs/apk/debug/app-debug.apk
-          asset_name: "github-actions-demo00_v${{ steps.detect_version.outputs.version_name }}(${{ steps.detect_version.outputs.version_code }}).apk"
+          asset_name: "github-actions-demo00_v${{ steps.detect_version.outputs.version_name }}-${{ steps.detect_version.outputs.version_code }}.apk"
           asset_content_type: application/zip
