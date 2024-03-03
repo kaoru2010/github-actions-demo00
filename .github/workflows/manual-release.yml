@@ -14,7 +14,6 @@ permissions:
 
 jobs:
   update_releases:
-    if: github.event.pull_request.merged == true
     permissions:
       # write permission is required to create a github release
       contents: write
@@ -48,5 +47,6 @@ jobs:
           commitish: ${{ github.event.inputs.commit-ish }}
           name: "v${{ steps.detect_version.outputs.version_name }}(${{ steps.detect_version.outputs.version_code }})"
           tag: "v${{ steps.detect_version.outputs.version_name }}"
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
