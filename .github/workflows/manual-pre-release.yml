@@ -43,6 +43,7 @@ jobs:
           ./gradlew $GRADLE_TASK
           cat "$MANIFEST_FILE" | python3 tools/apk_util/parse_app_version.py >> "$GITHUB_OUTPUT"
           TZ=Asia/Tokyo date "+%Y%m%dT%H%M%S" | xargs -I"{}" echo "dev_version={}" >> "$GITHUB_OUTPUT"
+          git rev-parse -q --verify HEAD --end-of-options | xargs -I"{}" echo "current_sha1={}" >> "$GITHUB_OUTPUT"
       - uses: release-drafter/release-drafter@v5
         id: create_release
         with:
@@ -52,6 +53,7 @@ jobs:
           prerelease: true
           prerelease-identifier: dev
           publish: true
+          head: "${{ steps.detect_version.outputs.current_sha1 }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload Release Asset
