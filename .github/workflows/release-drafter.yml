@@ -6,14 +6,15 @@ on:
       - master
       - main
   pull_request:
-    types: [opened, reopened, synchronize]
+    types:
+      - closed
 
 permissions:
   contents: read
 
 jobs:
   update_release_draft:
-    if: contains(github.event.pull_request.labels.*.name, 'release_note')
+    if: github.event.pull_request.merged == true
     permissions:
       # write permission is required to create a github release
       contents: write
