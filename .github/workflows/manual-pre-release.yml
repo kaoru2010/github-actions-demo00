@@ -26,6 +26,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.commit-ish }}
+      - name: Validate commit-ish
+        id: validate_commit-ish
+        run: |
+          git rev-parse -q --verify "${{ github.event.inputs.commit-ish }}" --end-of-options | xargs -I"{}" echo "commit_id={}" >> "$GITHUB_OUTPUT"
       - name: Setup JDK
         uses: actions/setup-java@v3
         with:
@@ -43,7 +47,6 @@ jobs:
           ./gradlew $GRADLE_TASK
           cat "$MANIFEST_FILE" | python3 tools/apk_util/parse_app_version.py >> "$GITHUB_OUTPUT"
           TZ=Asia/Tokyo date "+%Y%m%dT%H%M%S" | xargs -I"{}" echo "dev_version={}" >> "$GITHUB_OUTPUT"
-          git rev-parse -q --verify HEAD --end-of-options | xargs -I"{}" echo "current_sha1={}" >> "$GITHUB_OUTPUT"
       - uses: release-drafter/release-drafter@v5
         id: create_release
         with:
@@ -53,11 +56,11 @@ jobs:
           prerelease: true
           prerelease-identifier: dev
           publish: true
-          head: "${{ steps.detect_version.outputs.current_sha1 }}"
+          head: "${{ steps.validate_commit-ish.outputs.commit_id }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload Release Asset
-        id: upload-release-asset 
+        id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
