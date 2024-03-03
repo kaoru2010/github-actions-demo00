@@ -1,3 +1,6 @@
+tag-prefix: v
+commitish: refs/heads/main
+filter-by-commitish: true
 template: |
 
   ## What’s Changed
