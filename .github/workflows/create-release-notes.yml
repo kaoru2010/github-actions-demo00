@@ -37,7 +37,7 @@ jobs:
       - name: Detect app version from manifest
         id: detect_version
         env:
-          GRADLE_TASK: assembleDebug # ":app:processDebugMainManifest"
+          GRADLE_TASK: ":app:processDebugMainManifest" # assembleDebug # ":app:processDebugMainManifest"
           MANIFEST_FILE: ./app/build/intermediates/merged_manifest/debug/processDebugMainManifest/AndroidManifest.xml
         run: |
           ./gradlew $GRADLE_TASK
@@ -45,6 +45,8 @@ jobs:
           TZ=Asia/Tokyo date "+%Y%m%dT%H%M%S" | xargs -I"{}" echo "dev_version={}" >> "$GITHUB_OUTPUT"
 
       - name: Create release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git_tag="v${{ steps.detect_version.outputs.version_name }}(${{ steps.detect_version.outputs.version_code }}).dev.${{ steps.detect_version.outputs.dev_version }}"
           gh release create "$git_tag" --generate-notes --draft --prerelease --target ${{ github.event.inputs.commit-ish }}
